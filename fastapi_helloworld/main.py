@@ -1,8 +1,11 @@
+from sqlmodel import Session, SQLModel, create_engine, select
 from contextlib import asynccontextmanager
 from typing import Union, Optional, Annotated
 from fastapi_helloworld import settings
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from fastapi import FastAPI, Depends
+from fastapi import HTTPException
+
 
 
 class Todo(SQLModel, table=True):
@@ -54,7 +57,7 @@ def get_session():
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "My Beautiful Test World"}
 
 @app.post("/todos/", response_model=Todo)
 def create_todo(todo: Todo, session: Annotated[Session, Depends(get_session)]):
@@ -68,3 +71,28 @@ def create_todo(todo: Todo, session: Annotated[Session, Depends(get_session)]):
 def read_todos(session: Annotated[Session, Depends(get_session)]):
         todos = session.exec(select(Todo)).all()
         return todos
+
+# Update (PUT /todos/{todo_id}/)
+@app.put("/todos/{todo_id}/", response_model=Todo)
+def update_todo(todo_id: int, todo: Todo, session: Annotated[Session, Depends(get_session)]):
+    db_todo = session.get(Todo, todo_id)
+    if db_todo:
+        db_todo.content = todo.content
+        session.add(db_todo)
+        session.commit()
+        session.refresh(db_todo)
+        return db_todo
+    else:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+
+# Delete (DELETE /todos/{todo_id}/)
+@app.delete("/todos/{todo_id}/", response_model=Todo)
+def delete_todo(todo_id: int, session: Annotated[Session, Depends(get_session)]):
+    db_todo = session.get(Todo, todo_id)
+    if db_todo:
+        session.delete(db_todo)
+        session.commit()
+        return db_todo
+    else:
+        raise HTTPException(status_code=404, detail="Todo not found")

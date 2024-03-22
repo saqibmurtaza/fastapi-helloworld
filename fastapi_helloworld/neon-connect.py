@@ -1,6 +1,6 @@
 import os
 
-import psycopg2
+import psycopg
 
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ connection_string = os.getenv('DATABASE_URL')
 
 # Connect to the Postgres database
 
-conn = psycopg2.connect(connection_string)
+conn = psycopg.connect(connection_string)
 
 
 

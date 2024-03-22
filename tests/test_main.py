@@ -6,6 +6,7 @@ from fastapi_helloworld.main import app, get_session, Todo
 
 from fastapi_helloworld import settings
 
+
 # https://fastapi.tiangolo.com/tutorial/testing/
 # https://realpython.com/python-assert-statement/
 # https://understandingdata.com/posts/list-of-python-assert-statements-for-unit-tests/
@@ -16,7 +17,7 @@ def test_read_main():
     client = TestClient(app=app)
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"Hello": "World"}
+    assert response.json() == {"Hello": "My Beautiful World"}
 
 def test_write_main():
 
